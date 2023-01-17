@@ -284,17 +284,16 @@ def Date_Loop(fullyear,categories):
 
 
 def Categories_Loop(fullyear, categories):
-    print("categories")
+    print("Sorry, this function is not available at the moment")
 
 def Month_Loop(fullyear,categories):
-    print("month")
+    print("Sorry, this function is not available at the moment")
 
 def Graph_Loop(fullyear,categories):
-    print("graph")
+    print("Sorry, this function is not available at the moment")
 
 def Main_Help(fullyear,categories):
-    print("help")
-    print("this is cool")
+    print("Sorry, this function is not available at the moment")
 
 def Main_Loop(fullyear,categories):
     print("Hello! Welcome to your Expenses of 2023!")
