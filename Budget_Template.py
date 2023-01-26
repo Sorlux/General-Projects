@@ -1,6 +1,6 @@
 import openpyxl as xl
 import calendar
-
+from openpyxl.chart import (ScatterChart, BarChart, Reference, Series)
 jan = []
 feb = []
 mar = []
@@ -62,7 +62,7 @@ def Category_Initialization():
     answer = ""
     categories = []
     i = False
-    print("What category do you wish to use for your Budgeting? (if finished adding categories, write done)")
+    print("What categories do you wish to use for your budgeting? (if finished adding categories, write done)")
 
     while answer != "y":
         category = input()
@@ -198,12 +198,12 @@ def Date_Action(cell, current_date, current_category):
         else:
             print("Sorry, that answer was invalid, Please try again.")
 
-        workbook.save("Budget.xlsx")
+        Saving()
 
 
 
 # Once the date is selected, a category must be chosen to view their data for that date.
-def Date_Selection_Loop(date_index,categories,fullyear):
+def Date_Selection_Loop(date_index,):
 
     answer = ""
     current_date = fullyear[date_index]
@@ -261,11 +261,11 @@ def Calculate_Totals(interested_index, total_category, overall = False,):
                 total = total + cell.value
                 cell = sheet.cell(y+2,category_index+2)
                 cell.value = total
-    workbook.save("Budget.xlsx")
+    Saving()
 
 # Overall loop used when the Date option is selected.
 # Houses all the functions related to the Date category    
-def Date_Loop(fullyear,categories):
+def Date_Loop():
     answer = ""
     while answer != "return":
         print("What date do you want to view? (type help for more information)")
@@ -278,24 +278,48 @@ def Date_Loop(fullyear,categories):
             continue
         else:
             date_index = fullyear.index(answer)
-            Date_Selection_Loop(date_index, categories, fullyear)
+            Date_Selection_Loop(date_index)
+
+def Graphing_Loop():
+    yvalues = Reference(sheet,
+            min_row= 1, 
+            max_row = fullyear.index("dec 31")+1, 
+            min_col = categories.index("overall total")+2,
+            max_col = categories.index("overall total")+2)
+
+    xvalues = Reference(sheet,
+            min_row= 2, 
+            max_row = fullyear.index("dec 31")+1,
+            min_col = 1,
+            max_col = 1)
 
 
+    chart = ScatterChart()
+    chart.height = 10
+    chart.width = 20
+    chart.title = "Amount of Money Spended Throughout Year"
+    chart.style = 5
+    chart.x_axis.title = "Days in the Year (Days)"
+    chart.y_axis.title = "Money (CAD)"
+    series = Series(yvalues, xvalues, title_from_data=True)
+    chart.series.append(series)
+    sheet.add_chart(chart, "U2")
+    Saving()
 
-
-def Categories_Loop(fullyear, categories):
+def Categories_Loop():
     print("Sorry, this function is not available at the moment")
 
-def Month_Loop(fullyear,categories):
+def Month_Loop():
     print("Sorry, this function is not available at the moment")
 
-def Graph_Loop(fullyear,categories):
+def Graph_Loop():
+    Graphing_Loop()
+    Saving()
+
+def Main_Help():
     print("Sorry, this function is not available at the moment")
 
-def Main_Help(fullyear,categories):
-    print("Sorry, this function is not available at the moment")
-
-def Main_Loop(fullyear,categories):
+def Main_Loop():
     print("Hello! Welcome to your Expenses of 2023!")
     program = ""
 
@@ -322,10 +346,18 @@ def Main_Loop(fullyear,categories):
         program = program.lower()
         if program in switcher:
             if program != "exit":
-                switcher[program](fullyear,categories)
+                switcher[program]()
         else:
             print("Sorry! That was an invalid answer, please try again.")
 
+def Saving():
+    try:
+        workbook.save("Budget.xlsx")
+    except PermissionError:
+        print("The workbook failed to save because it is currently still open")
+        print("Please close the workbook so the program can save any changes you have made to the workbook!")
+    except:
+        print("An error occured and the workbook was not saved as a result.")
 
 
 
@@ -341,6 +373,6 @@ workbook, sheet = Set_Workbook_And_Sheet()
 #If any changes are made on the excel document directly, this will calculate the totals for the entire year before options begin.
 Calculate_Totals(fullyear.index("dec 31"),"date total")
 
-workbook.save("Budget.xlsx")
+Saving()
 
-Main_Loop(fullyear,categories)
+Main_Loop()
