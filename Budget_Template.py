@@ -15,7 +15,15 @@ nov = []
 dec = []
 months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug","sep","oct","nov","dec"]
 
-# Creates the table that will be used in the excel sheet and the program with chosen categories.
+"""
+Creates the table that will be used in the excel sheet and the program with chosen categories.
+
+Arguments:
+- fullyear (list): a list of all the days in the year in month abbreviated format
+- categories (list): a list of categories chosen by the user for budgeting
+- sheet (object): an object representing the sheet in an excel workbook
+"""
+
 def Table_Creation(fullyear,categories,sheet):
     # Standardizing the excel sheet in this specific way enables the program to function properly.
     cell = 0
@@ -34,9 +42,15 @@ def Table_Creation(fullyear,categories,sheet):
             cell = sheet.cell(row,column)
             cell.value = 0
 
-# Creates list of all the days in the year in month abbreviated format.
-# Format was specified so there wouldn't be any amiguity in what date format the user uses and it is clear and easy to type with.
-# Used a function and Calendar module instead of hard coding so that in future iterations of the program, it will ask the user for a specific year and account for a leap year.
+"""
+Creates list of all the days in the year in month abbreviated format using a function and the calendar module.
+Format was specified so there wouldn't be any ambiguity in what date format the user uses and it is clear and easy to type with.
+Used a function and Calendar module instead of hard coding so that in future iterations of the program, it will ask the user for a specific year and account for a leap year.
+
+Returns:
+- fullyear (list): a list of all the days in the year in month abbreviated format
+"""
+
 def Days_In_The_Year():
     fullyear = []
     obj = calendar.Calendar()
@@ -57,18 +71,24 @@ def Days_In_The_Year():
 
     return fullyear
 
-# If it is the first time the program is being used, this function will run and is the overall function that creates the categories and implements them properly.
+"""
+Asks the user for categories to use for budgeting, and creates 4 extra categories for data analysis.
+
+Returns:
+- categories (list): a list of categories chosen by the user for budgeting, plus 4 extra categories
+"""
 def Category_Initialization():
     answer = ""
     categories = []
     i = False
-    print("What categories do you wish to use for your budgeting? (if finished adding categories, write done)")
+    print("What categories do you wish to use for your budgeting? (if finished adding categories, write 'done')")
 
     while answer != "y":
         category = input()
         category = category.lower()
-
-        if category == "done":
+        if category in categories:
+            print("Sorry!, you already have this category within the list!")
+        elif category == "done":
             i = False
 
             while i != True:
@@ -98,7 +118,13 @@ def Category_Initialization():
 
     return categories
 
-# Open up the Excel document and switches the sheet to the first sheet in the workbook
+"""
+Opens an Excel document and switches the sheet to the first sheet in the workbook.
+
+Returns:
+- workbook (object): an object representing an Excel workbook
+- sheet (object): an object representing the sheet in an Excel workbook
+"""
 def Set_Workbook_And_Sheet():
     # Want to make sure that the correct excel workbook and sheet are being used so that all the functions work properly.
     workbook = xl.load_workbook("Budget.xlsx")
@@ -108,7 +134,9 @@ def Set_Workbook_And_Sheet():
 
     return workbook, sheet
 
-# Overall function used to house all the other functions related to creating the Calendar and the table as a whole
+"""
+Overall function used to house all the other functions related to creating the calendar and the table as a whole.
+"""
 def Calendar_Creation():
     # Can I remove this?
     fullyear = Days_In_The_Year()
@@ -126,7 +154,12 @@ def Calendar_Creation():
 
     workbook.save("Budget.xlsx")
 
-# Confirms whether the Excel sheet is formatted properly before running the main portino of the program.
+"""
+Confirms whether the Excel sheet is formatted properly before running the main portion of the program.
+
+Arguments:
+- startup (bool): a boolean indicating whether the program is starting up for the first time or not
+"""
 def Calendar_Confirmation(startup):
 
     while startup == False:
@@ -147,7 +180,9 @@ def Calendar_Confirmation(startup):
         except:
             Calendar_Creation()
 
-# As the name implies, counts the total number of days in the year and returns a list containing all the dates in abbreviated format.
+"""
+Counts the total number of days in the year and returns a list containing all the dates in abbreviated format.
+"""
 def Count_Days():
 
     fullyear = []
@@ -159,7 +194,9 @@ def Count_Days():
     return fullyear
 
 
-# As the name implies, counts the total number of categories in the table and returns a list containing the name of those categories
+"""
+Counts the total number of categories in the table and returns a list containing the name of those categories
+"""
 def Count_Categories():
 
     categories = []
@@ -174,7 +211,14 @@ def Count_Categories():
             categories.append(cell.value)
     return categories
 
-# Once a date is selected, the user can do certain actions with the chosen date
+"""
+Enables the user to select different options for the specific date they have chosen
+
+Arugments:
+cell - The current cell chosen which houses the date and specific category the user is viewing
+current_date: The date that is currently being viewed
+current_category: The category that is currently being viewed
+"""
 def Date_Action(cell, current_date, current_category):
 
     answer = ""
@@ -202,8 +246,13 @@ def Date_Action(cell, current_date, current_category):
 
 
 
-# Once the date is selected, a category must be chosen to view their data for that date.
-def Date_Selection_Loop(date_index,):
+"""
+The user can choose a specific category they want to view for the date they chose
+
+Arguments:
+date_index: the index for the current date on the excel sheet
+"""
+def Date_Selection_Loop(date_index):
 
     answer = ""
     current_date = fullyear[date_index]
@@ -238,7 +287,14 @@ def Date_Selection_Loop(date_index,):
             Calculate_Totals(date_index, "overall total", True)
 
 
-# Contatins the functions related to calculating the totals in the table
+"""
+Houses the functions related to calculating the totals in the table
+
+Arguments:
+interested_index - The index that is causing this change to occur because it was manipulated elsewhere
+total_category - The chosen totals category from the 4 categories tracking the total values
+overall - Checks to see if the total category is the only category that must be updated
+"""
 def Calculate_Totals(interested_index, total_category, overall = False,):
 
     category_index = categories.index(total_category)
@@ -261,10 +317,13 @@ def Calculate_Totals(interested_index, total_category, overall = False,):
                 total = total + cell.value
                 cell = sheet.cell(y+2,category_index+2)
                 cell.value = total
+    # Save all the changes to the workbook
     Saving()
 
-# Overall loop used when the Date option is selected.
-# Houses all the functions related to the Date category    
+""" 
+Overall loop used when the Date option is selected.
+Houses all the functions related to the Date category   
+""" 
 def Date_Loop():
     answer = ""
     while answer != "return":
@@ -280,6 +339,10 @@ def Date_Loop():
             date_index = fullyear.index(answer)
             Date_Selection_Loop(date_index)
 
+"""
+Graphs the data as a Scatter Chart showing how the amount of total money spent has changed throughout the year.
+Will add more options for the type of graph and the data being graphed in the future.
+"""
 def Graphing_Loop():
     yvalues = Reference(sheet,
             min_row= 1, 
@@ -319,6 +382,9 @@ def Graph_Loop():
 def Main_Help():
     print("Sorry, this function is not available at the moment")
 
+"""
+Main Loop of the program, enabling the user to view and change their data, manipulate it, and create graphs to analyze it
+"""
 def Main_Loop():
     print("Hello! Welcome to your Expenses of 2023!")
     program = ""
@@ -349,7 +415,9 @@ def Main_Loop():
                 switcher[program]()
         else:
             print("Sorry! That was an invalid answer, please try again.")
-
+"""
+Saves the workbook and checks to see if it is open.
+"""
 def Saving():
     try:
         workbook.save("Budget.xlsx")
