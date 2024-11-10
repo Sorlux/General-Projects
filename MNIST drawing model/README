@@ -1,0 +1,1 @@
+Seems the problem is that the model can predict MNIST digits very well, but is bad at predicting any other kind of drawing. I need to find a different data set to predict hand written digits that are not in the style of MNIST.
